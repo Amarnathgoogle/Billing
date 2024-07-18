@@ -86,19 +86,19 @@
             });
             inp.addEventListener("keydown", function(e) {
                 var x = e.keyCode;
-                if (x === 13) {
+                if (x === 13) { // Enter key
                     e.preventDefault();
                     if (currentFocus > -1) {
                         closeAllLists();
                         a[currentFocus].click();
                     }
-                } else if (x === 40) {
+                } else if (x === 40) { // Down arrow
                     currentFocus++;
                     addActive(a);
-                } else if (x === 38) {
+                } else if (x === 38) { // Up arrow
                     currentFocus--;
                     addActive(a);
-                } else if (x === 27) {
+                } else if (x === 27) { // Escape key
                     closeAllLists();
                 }
             });
@@ -122,5 +122,4 @@
                 if (!x) return false;
                 closeAllLists();
                 for (var i = 0; i < x.length; i++) {
-                    x[i].style.backgroundColor = i === currentFocus ? "#eee" : "white";
-                    x[i].style.fontWeight = i === currentFocus ? "bold" : "normal";
+                    x[i].style.backgroundColor = i === currentFocus ? "#eee
