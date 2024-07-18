@@ -5,86 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Billing System</title>
     <style>
+        body {
+            font-family: sans-serif;
+        }
+
         table {
             border-collapse: collapse;
             width: 100%;
         }
+
         th, td {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #ddd;
         }
+
+        .color-picker {
+            width: 50px;
+            height: 20px;
+            border: 1px solid #ccc;
+            padding: 2px;
+        }
+
         .autocomplete {
             position: relative;
             display: inline-block;
         }
-        .autocomplete-items {
-            position: absolute;
-            border: 1px solid #ddd;
-            border-bottom: none;
-            border-top: none;
-            z-index: 99;
-            /*position the autocomplete items to be below the element that triggered the autocomplete (by default):*/
-            top: 100%;
-            left: 0;
-            right: 0;
-            background-color: #fff;
-            min-width: 160px;
-            /*ensure the items are always below the autocomplete box:**
-            overflow: auto;
-        }
-        .autocomplete-items div {
-            padding: 16px;
-            cursor: pointer;
-            background-color: #fff;
-            border: none;
-            text-align: left;
-        }
-        .autocomplete-active {
-            /*change background color of the hovered item:*/
-            background-color: #ddd;
-            /*color warranty with current item while hovering*/
-            color: #000;
-        }
+
         .autocomplete-suggestions {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 100%;
             border: 1px solid #ddd;
+            background-color: white;
+            min-width: 100%;
+        }
+
+        .autocomplete-suggestions div {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .autocomplete-suggestions div:hover {
+            background-color: #eee;
         }
     </style>
     <script>
-        // Brand name suggestions
-        var brandNames = ["Kurnool green", "Kurnool red", "Kurnool blue", "Anarkali", "RRI", "Suryateja", "dawat", "JSR", "vgr"];
+        // Function to update date and time automatically
+        function updateTime() {
+            var today = new Date();
+            var date = today.toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            });
+            var time = today.toLocaleTimeString("en-IN", {
+                hour: "numeric",
+                minute: "numeric",
+                hour12: true
+            });
+            document.getElementById("date").value = date;
+            document.getElementById("time").value = time;
+        }
 
+        // Function to perform autocomplete for brand names and payment methods
         function autocomplete(inp, arr) {
-            /* Code for autocomplete functionality (same as before) */
-        }
-
-        // Initialize autocomplete on brand input field
-        var brandInput = document.getElementById("brand");
-        if (brandInput) {
-            autocomplete(brandInput, brandNames);
-        }
-    </script>
-</head>
-<body>
-    <h1>Billing System</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Price</th>
-                <th>Paid or Not</th>
-                <th>Brand Name</th>
-                <th>Time</th>
-                <th>Date</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>$100</td>
-                <td><select><option value="paid">Paid</option><option value="not_paid">Not Paid</option></select></td>
-                <td><input type="text" id="brand" class="autocomplete"></td>
-                <td><script>document.write(new Date().toLocaleTimeString())</script></td>
-                <td><script>document.write(new Date().toLocaleDateString())</script></td>
-            </tr>
-        </tbody>
-    </table>
-</body>
-</html>
+            var currentFocus;
+            inp.addEventListener("input", function(e) {
+                var a, b, i, val = this.value;
+                currentFocus = -1;
+                closeAllLists();
+                if (!val) { return false;}
+                a = createSuggestionList(arr);
+                for (i = 0; i < a.length; i++) {
+                    b = a[i];
+                    if (b.textContent.toLowerCase().indexOf(val.toLowerCase()) > -1) {
+                        b.style.display = "block";
+                    }
+                }
+            });
+            inp.addEventListener("keydown", function(e) {
+                var x = e.keyCode;
+                if (x === 13) {
+                    e.preventDefault();
+                    if (currentFocus > -1) {
+                        closeAllLists();
+                        a[currentFocus].click();
+                    }
+                } else if (x === 40) {
+                    currentFocus++;
+                    addActive(a);
+                } else if (x === 38) {
+                    currentFocus--;
+                    addActive(a);
+                } else if (x === 27) {
+                    closeAllLists();
+                }
+            });
+            function createSuggestionList(arr) {
+                var i, div = document.createElement("DIV");
+                div.setAttribute("id", this.id + "autocomplete-list");
+                div.setAttribute("class", "autocomplete-suggestions");
+                this.parentNode.appendChild(div);
+                for (i = 0; i < arr.length; i++) {
+                    var div2 = document.createElement("DIV");
+                    div2.innerHTML = arr[i];
+                    div2.addEventListener("click", function(e) {
+                        inp.value = this.textContent;
+                        closeAllLists();
+                    });
+                    div.appendChild(div2);
+                }
+                return div.childNodes;
+            }
+            function addActive(x) {
+                if (!x) return false;
+                closeAllLists();
+                for (var i = 0; i < x.length; i++) {
+                    x[i].style.backgroundColor = i === currentFocus ? "#eee" : "white";
+                    x[i].style.fontWeight = i === currentFocus ? "bold" : "normal";
