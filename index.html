@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Billing System</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        .autocomplete {
+            position: relative;
+            display: inline-block;
+        }
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            border-top: none;
+            z-index: 99;
+            /*position the autocomplete items to be below the element that triggered the autocomplete (by default):*/
+            top: 100%;
+            left: 0;
+            right: 0;
+            background-color: #fff;
+            min-width: 160px;
+            /*ensure the items are always below the autocomplete box:**
+            overflow: auto;
+        }
+        .autocomplete-items div {
+            padding: 16px;
+            cursor: pointer;
+            background-color: #fff;
+            border: none;
+            text-align: left;
+        }
+        .autocomplete-active {
+            /*change background color of the hovered item:*/
+            background-color: #ddd;
+            /*color warranty with current item while hovering*/
+            color: #000;
+        }
+        .autocomplete-suggestions {
+            border: 1px solid #ddd;
+        }
+    </style>
+    <script>
+        function autocomplete(inp, arr) {
+            /*declare variable "currentFocus" to track which item is currently selected*/
+            var currentFocus;
+            /*execute a function when someone writes in the text field:*/
+            inp.addEventListener("input", function(e) {
+                var a, val = this.value;
+                /*close any already open suggestion list*/
+                closeAllLists();
+                if (!val) { return false;}
+                currentFocus = -1;
+                /*create a DIV element that will contain the items (values):*/
+                var div = document.createElement("DIV");
+                div.setAttribute("id", this.id + "autocomplete-list");
+                div.setAttribute("class", "autocomplete-items");
+                this.parentNode.appendChild(div);
+                /*for each item in the array...*/
+                for (let i = 0; i < arr.length; i++) {
+                    /*check if the item starts with the same letters as the text field value*/
+                    if (arr[i].substr(0, val.length).toUpperCase() === val.toUpperCase()) {
+                        /*create a DIV element for each matching item:*/
+                        a = document.createElement("DIV");
+                        /*make the item a link and set the data*/
+                        a.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+                        a.innerHTML += arr[i].substr(val.length);
+                        a.setAttribute("inputValue", arr[i]);
+                        /*execute a function when someone clicks on the item (selected):*/
+                        a.addEventListener("click", function(e) {
+                            /*insert the value for the autocomplete text field*/
+                            inp.value = this.getAttribute("inputValue");
+                            /*close the list of suggestions*/
+                            closeAllLists();
+                        });
+                        div.appendChild(a);
+                    }
+                }
+            });
+            /*execute a function when someone clicks in the document (outside the autocomplete container):*/
+            document.addEventListener("click", function (e) {
+                closeAllLists(e.target);
+            });
+        }
+
+        function closeAllLists(elm) {
+            /*close all autocomplete lists in the document, except the one passed as an argument*/
+            var x = document.getElementsByClassName("autocomplete-items");
+            for (let i = 0; i < x.length; i++) {
+                if (elm !== x[i] && elm !== inp) {
+                    x[i].parentNode.removeChild(x[i]);
+                }
+            }
+        }
+        /*initiate the autocomplete function on the "brand" input field, providing the brand name
