@@ -1,125 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Billing System</title>
-    <style>
-        body {
-            font-family: sans-serif;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Billing Page</title>
+  <style>
+    body {
+      font-family: sans-serif;
+    }
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      width: 80%;
+      margin: 0 auto;
+    }
+    .billing-section {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 48%;
+    }
+    .billing-section:last-child {
+      margin-bottom: 0;
+    }
+    .input-group {
+      display: flex;
+      margin-bottom: 5px;
+    }
+    .input-group label {
+      width: 30%;
+      text-align: right;
+    }
+    .input-group input,
+    .input-group select {
+      width: 70%;
+      padding: 5px;
+      border: 1px solid #ddd;
+    }
+  </style>
+  <script>
+    function updateTime() {
+      var date = new Date();
+      var time = date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" }); // India Timezone
+      var dateString = date.toLocaleDateString();
+      document.querySelectorAll(".billing-section .time").forEach(element => element.textContent = time);
+      document.querySelectorAll(".billing-section .date").forEach(element => element.textContent = dateString);
+    }
 
-        table {
-            border-collapse: collapse;
-            width: 100%;
-        }
+    function addBillingSection() {
+      var container = document.querySelector(".container");
+      var newSection = container.cloneNode(true);
+      newSection.querySelectorAll("input").forEach(input => input.value = "");
+      container.appendChild(newSection);
+      updateTime();
+    }
 
-        th, td {
-            padding: 10px;
-            border: 1px solid #ddd;
-        }
+    window.addEventListener("DOMContentLoaded", updateTime);
 
-        .color-picker {
-            width: 50px;
-            height: 20px;
-            border: 1px solid #ccc;
-            padding: 2px;
+    document.addEventListener("keyup", function(event) {
+      if (event.target.classList.contains("brand")) {
+        updateTime();
+        var sections = document.querySelectorAll(".billing-section");
+        if (sections.length < 10 && event.target.value !== "") {  // Add limit of 10 sections
+          addBillingSection();
         }
-
-        .autocomplete {
-            position: relative;
-            display: inline-block;
-        }
-
-        .autocomplete-suggestions {
-            display: none;
-            position: absolute;
-            left: 0;
-            top: 100%;
-            border: 1px solid #ddd;
-            background-color: white;
-            min-width: 100%;
-        }
-
-        .autocomplete-suggestions div {
-            padding: 10px;
-            cursor: pointer;
-        }
-
-        .autocomplete-suggestions div:hover {
-            background-color: #eee;
-        }
-    </style>
-    <script>
-        // Function to update date and time automatically
-        function updateTime() {
-            var today = new Date();
-            var date = today.toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "long",
-                year: "numeric"
-            });
-            var time = today.toLocaleTimeString("en-IN", {
-                hour: "numeric",
-                minute: "numeric",
-                hour12: true
-            });
-            document.getElementById("date").value = date;
-            document.getElementById("time").value = time;
-        }
-
-        // Function to perform autocomplete for brand names and payment methods
-        function autocomplete(inp, arr) {
-            var currentFocus;
-            inp.addEventListener("input", function(e) {
-                var a, b, i, val = this.value;
-                currentFocus = -1;
-                closeAllLists();
-                if (!val) { return false;}
-                a = createSuggestionList(arr);
-                for (i = 0; i < a.length; i++) {
-                    b = a[i];
-                    if (b.textContent.toLowerCase().indexOf(val.toLowerCase()) > -1) {
-                        b.style.display = "block";
-                    }
-                }
-            });
-            inp.addEventListener("keydown", function(e) {
-                var x = e.keyCode;
-                if (x === 13) { // Enter key
-                    e.preventDefault();
-                    if (currentFocus > -1) {
-                        closeAllLists();
-                        a[currentFocus].click();
-                    }
-                } else if (x === 40) { // Down arrow
-                    currentFocus++;
-                    addActive(a);
-                } else if (x === 38) { // Up arrow
-                    currentFocus--;
-                    addActive(a);
-                } else if (x === 27) { // Escape key
-                    closeAllLists();
-                }
-            });
-            function createSuggestionList(arr) {
-                var i, div = document.createElement("DIV");
-                div.setAttribute("id", this.id + "autocomplete-list");
-                div.setAttribute("class", "autocomplete-suggestions");
-                this.parentNode.appendChild(div);
-                for (i = 0; i < arr.length; i++) {
-                    var div2 = document.createElement("DIV");
-                    div2.innerHTML = arr[i];
-                    div2.addEventListener("click", function(e) {
-                        inp.value = this.textContent;
-                        closeAllLists();
-                    });
-                    div.appendChild(div2);
-                }
-                return div.childNodes;
-            }
-            function addActive(x) {
-                if (!x) return false;
-                closeAllLists();
-                for (var i = 0; i < x.length; i++) {
-                    x[i].style.backgroundColor = i === currentFocus ? "#eee
+      }
+    });
+  </script>
+</head>
+<body>
+  <h1>Billing</h1>
+  <div class="container">
+    <div class="billing-section">
+      <div class="input-group">
+        <label for="brand">Brand:</label>
+        <input type="text" class="brand" onkeyup="this.value = this.value.toUpperCase()">
+      </div>
+      <div class="input-group">
+        <label for="time">Time:</label>
+        <span class="time"></span>
+      </div>
+      <div class="input-group">
+        <label for="date">Date:</label>
+        <span class="date"></span>
+      </div>
+      </div>
+    </div>
+</body>
+</html>
