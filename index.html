@@ -10,29 +10,31 @@
     }
     .container {
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
       width: 80%;
       margin: 0 auto;
     }
     .billing-section {
-      border: 1px solid #ddd;
-      padding: 10px;
-      margin-bottom: 10px;
-      width: 48%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px;
+      border-bottom: 1px solid #ddd;
     }
     .billing-section:last-child {
-      margin-bottom: 0;
+      border-bottom: none;
+    }
+    .title {
+      font-weight: bold;
     }
     .input-group {
       display: flex;
-      margin-bottom: 5px;
     }
     .input-group label {
       width: 30%;
       text-align: right;
     }
-    .input-group input,
-    .input-group select {
+    .input-group input {
       width: 70%;
       padding: 5px;
       border: 1px solid #ddd;
@@ -43,27 +45,36 @@
       var date = new Date();
       var time = date.toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata" }); // India Timezone
       var dateString = date.toLocaleDateString();
-      document.querySelectorAll(".billing-section .time").forEach(element => element.textContent = time);
-      document.querySelectorAll(".billing-section .date").forEach(element => element.textContent = dateString);
+      document.querySelectorAll(".time").forEach(element => element.textContent = time);
+      document.querySelectorAll(".date").forEach(element => element.textContent = dateString);
     }
 
     function addBillingSection() {
       var container = document.querySelector(".container");
-      var newSection = container.cloneNode(true);
-      newSection.querySelectorAll("input").forEach(input => input.value = "");
-      container.appendChild(newSection);
-      updateTime();
+      if (container.children.length < 16) { // Limit to 15 lines (including title)
+        var newSection = document.createElement("div");
+        newSection.classList.add("billing-section");
+        newSection.innerHTML = `
+          <span class="title">Brand | </span>
+          <span class="date"></span>
+          <span class="time"></span>
+          <div class="input-group">
+            <label for="brand">Brand:</label>
+            <input type="text" class="brand" onkeyup="this.value = this.value.toUpperCase()">
+          </div>`;
+        container.appendChild(newSection);
+        updateTime();
+      }
     }
 
-    window.addEventListener("DOMContentLoaded", updateTime);
+    window.addEventListener("DOMContentLoaded", function() {
+      updateTime();
+      addBillingSection(); // Add initial section
+    });
 
     document.addEventListener("keyup", function(event) {
       if (event.target.classList.contains("brand")) {
         updateTime();
-        var sections = document.querySelectorAll(".billing-section");
-        if (sections.length < 10 && event.target.value !== "") {  // Add limit of 10 sections
-          addBillingSection();
-        }
       }
     });
   </script>
@@ -71,20 +82,6 @@
 <body>
   <h1>Billing</h1>
   <div class="container">
-    <div class="billing-section">
-      <div class="input-group">
-        <label for="brand">Brand:</label>
-        <input type="text" class="brand" onkeyup="this.value = this.value.toUpperCase()">
-      </div>
-      <div class="input-group">
-        <label for="time">Time:</label>
-        <span class="time"></span>
-      </div>
-      <div class="input-group">
-        <label for="date">Date:</label>
-        <span class="date"></span>
-      </div>
-      </div>
-    </div>
+  </div>
 </body>
 </html>
